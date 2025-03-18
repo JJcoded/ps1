@@ -76,42 +76,50 @@ function Show-FakeError {
 )
 
     $message = $messages | Get-Random
-    Add-Type -TypeDefinition @"
-    using System;
-    using System.Runtime.InteropServices;
-    public class WinAPI {
-        [DllImport("user32.dll")]
-        public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
-    }
+
+    # Check if WinAPI is already defined before adding
+    if (-not ([System.Management.Automation.PSTypeName]'WinAPI').Type) {
+        Add-Type -TypeDefinition @"
+        using System;
+        using System.Runtime.InteropServices;
+        public class WinAPI {
+            [DllImport("user32.dll")]
+            public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
+        }
 "@ -Language CSharp
+    }
+
     [WinAPI]::MessageBox([IntPtr]::Zero, $message, "SYSTEM FAILURE", 0x10)
 }
 
 # Function for screen glitch (flashing window effect)
 function Screen-Glitch {
-    Add-Type -TypeDefinition @"
-    using System;
-    using System.Runtime.InteropServices;
-    public class WinAPI {
-        [DllImport("user32.dll")]
-        public static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
-        public struct FLASHWINFO {
-            public uint cbSize;
-            public IntPtr hwnd;
-            public uint dwFlags;
-            public uint uCount;
-            public uint dwTimeout;
+    # Check if FlashWindowEx API is already defined
+    if (-not ([System.Management.Automation.PSTypeName]'WinAPI_Flash').Type) {
+        Add-Type -TypeDefinition @"
+        using System;
+        using System.Runtime.InteropServices;
+        public class WinAPI_Flash {
+            [DllImport("user32.dll")]
+            public static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
+            public struct FLASHWINFO {
+                public uint cbSize;
+                public IntPtr hwnd;
+                public uint dwFlags;
+                public uint uCount;
+                public uint dwTimeout;
+            }
         }
-    }
 "@ -Language CSharp
+    }
 
-    $flInfo = New-Object WinAPI+FLASHWINFO
+    $flInfo = New-Object WinAPI_Flash+FLASHWINFO
     $flInfo.cbSize = [System.Runtime.InteropServices.Marshal]::SizeOf($flInfo)
     $flInfo.hwnd = (Get-Process -Id $PID).MainWindowHandle
     $flInfo.dwFlags = 3
     $flInfo.uCount = 10
     $flInfo.dwTimeout = 0
-    [WinAPI]::FlashWindowEx([ref]$flInfo)
+    [WinAPI_Flash]::FlashWindowEx([ref]$flInfo)
 }
 
 # Start looping after an initial delay of 40 seconds
