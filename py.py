@@ -126,7 +126,7 @@ function Screen-Glitch {
 Start-Sleep -Seconds 2
 
 while ($true) {
-    Start-Sleep -Seconds (Get-Random -Minimum 2 -Maximum 10)  # Random interval (20-60s)
+    Start-Sleep -Seconds (Get-Random -Minimum 0.1 -Maximum 1.5)  # Random interval (20-60s)
     $randomEffect = Get-Random -InputObject @(
         "Show-FakeError",
         "Screen-Glitch"
