@@ -1,5 +1,5 @@
 # Wait 10 seconds before starting (suspense)
-Start-Sleep -Seconds 10
+Start-Sleep -Seconds 5
 
 # Function to show fake system failure popups
 function Show-FakeError {
@@ -123,10 +123,10 @@ function Screen-Glitch {
 }
 
 # Start looping after an initial delay of 40 seconds
-Start-Sleep -Seconds 40
+Start-Sleep -Seconds 2
 
 while ($true) {
-    Start-Sleep -Seconds (Get-Random -Minimum 20 -Maximum 60)  # Random interval (20-60s)
+    Start-Sleep -Seconds (Get-Random -Minimum 2 -Maximum 10)  # Random interval (20-60s)
     $randomEffect = Get-Random -InputObject @(
         "Show-FakeError",
         "Screen-Glitch"
